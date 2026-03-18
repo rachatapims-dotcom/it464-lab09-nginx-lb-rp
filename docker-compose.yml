@@ -1,0 +1,56 @@
+services:
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-load-balancer-lab09
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - web-net
+
+  web-server-1:
+    image: nginx:alpine
+    container_name: web1
+    ports:
+      - "8081:80"
+    networks:
+      - web-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    entrypoint: 
+      - /bin/sh
+      - -c
+      - |
+        echo "<h1>Web 1: [Name-Surname-Stu.ID-Section] | Host: $$(hostname) | IP: $$(hostname -i)</h1>" > /usr/share/nginx/html/index.html
+        nginx -g 'daemon off;'
+
+  web-server-2:
+    image: nginx:alpine
+    container_name: web2
+    ports:
+      - "8082:80"
+    networks:
+      - web-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    entrypoint: 
+      - /bin/sh
+      - -c
+      - |
+        echo "<h1>Web 2: [Name-Surname-Stu.ID-Section] | Host: $$(hostname) | IP: $$(hostname -i)</h1>" > /usr/share/nginx/html/index.html
+        nginx -g 'daemon off;'
+
+  # เพิ่ม web-server-3 และ web-server-4 ตามโครงสร้างด้านบนในโจทย์ถัดไป...
+
+networks:
+  web-net:
+    driver: bridge
