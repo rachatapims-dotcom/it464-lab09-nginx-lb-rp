@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   nginx-proxy:
     image: nginx:alpine
@@ -10,6 +12,11 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - web-net
+    depends_on:
+      - web-server-1
+      - web-server-2
+      - web-server-3
+      - web-server-4
 
   web-server-1:
     image: nginx:alpine
@@ -27,7 +34,7 @@ services:
       - /bin/sh
       - -c
       - |
-        echo "<h1>Web 1: [Name-Surname-Stu.ID-Section] | Host: $$(hostname) | IP: $$(hostname -i)</h1>" > /usr/share/nginx/html/index.html
+        echo "<h1>Web 1: rachata-pimsupsiri-1660705805-328A | Host: $$(hostname) | IP: $$(hostname -i)</h1>" > /usr/share/nginx/html/index.html
         nginx -g 'daemon off;'
 
   web-server-2:
@@ -46,10 +53,46 @@ services:
       - /bin/sh
       - -c
       - |
-        echo "<h1>Web 2: [Name-Surname-Stu.ID-Section] | Host: $$(hostname) | IP: $$(hostname -i)</h1>" > /usr/share/nginx/html/index.html
+        echo "<h1>Web 2: rachata-pimsupsiri-1660705805-328A | Host: $$(hostname) | IP: $$(hostname -i)</h1>" > /usr/share/nginx/html/index.html
         nginx -g 'daemon off;'
 
-  # เพิ่ม web-server-3 และ web-server-4 ตามโครงสร้างด้านบนในโจทย์ถัดไป...
+  web-server-3:
+    image: nginx:alpine
+    container_name: web3
+    ports:
+      - "8083:80"
+    networks:
+      - web-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    entrypoint: 
+      - /bin/sh
+      - -c
+      - |
+        echo "<h1>Web 3: rachata-pimsupsiri-1660705805-328A | Host: $$(hostname) | IP: $$(hostname -i)</h1>" > /usr/share/nginx/html/index.html
+        nginx -g 'daemon off;'
+
+  web-server-4:
+    image: nginx:alpine
+    container_name: web4
+    ports:
+      - "8084:80"
+    networks:
+      - web-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    entrypoint: 
+      - /bin/sh
+      - -c
+      - |
+        echo "<h1>Web 4: rachata-pimsupsiri-1660705805-328A | Host: $$(hostname) | IP: $$(hostname -i)</h1>" > /usr/share/nginx/html/index.html
+        nginx -g 'daemon off;'
 
 networks:
   web-net:
